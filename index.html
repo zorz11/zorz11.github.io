@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jadranka vs. Taksisti</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            touch-action: none; /* Prevents default touch behaviors */
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 600px;
+        }
+        
+        #introScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 5vw;
+            box-sizing: border-box;
+            text-align: center;
+            border: 3px solid #660000;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+        }
+        
+        #introText {
+            font-family: 'Nosifer', cursive;
+            color: #ff0000;
+            font-size: clamp(14px, 4vw, 18px);
+            line-height: 1.7;
+            text-shadow: 2px 2px 4px #000;
+            margin-bottom: 5vw;
+            max-width: 90%;
+            max-height: 60%;
+            overflow-y: auto;
+            padding: 4vw;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            border: 2px solid #990000;
+        }
+        
+        #startButton {
+            font-family: 'Creepster', cursive;
+            font-size: clamp(20px, 6vw, 28px);
+            padding: 3vw 8vw;
+            background: linear-gradient(to bottom, #990000, #660000);
+            color: white;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        #startButton:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 25px rgba(255, 0, 0, 0.6);
+            background: linear-gradient(to bottom, #ff0000, #990000);
+        }
+        
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #990000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            display: block;
+        }
+        
+        .bottom-controls {
+            width: 100%;
+            max-width: 800px;
+            padding: 2vw;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2vw;
+            justify-content: center;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+        
+        .action-button {
+            font-family: 'Creepster', cursive;
+            padding: 2vw 4vw;
+            font-size: clamp(16px, 5vw, 22px);
+            background: linear-gradient(to bottom, #990000, #660000);
+            color: white;
+            border: 2px solid #ff0000;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 0, 0, 0.3);
+            transition: all 0.2s;
+            flex: 1;
+            max-width: 25%;
+            text-align: center;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .action-button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to bottom, #ff0000, #990000);
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.5);
+        }
+        
+        .action-button:active {
+            transform: scale(0.95);
+        }
+        
+        .arrow-button {
+            font-size: clamp(18px, 6vw, 26px);
+            font-weight: bold;
+        }
+        
+        #shootButton {
+            font-size: clamp(18px, 6vw, 24px);
+            max-width: 35%;
+        }
+        
+        #newGameButton {
+            font-size: clamp(18px, 6vw, 24px);
+            background: linear-gradient(to bottom, #660000, #330000);
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            #gameContainer {
+                height: 80vh;
+            }
+            .bottom-controls {
+                padding: 1vw;
+                gap: 1vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="introScreen">
+            <div id="introText">
+                Jadranka je željela uživati u vožnji bicikla uz jezero Jarun, osjetiti vjetar u kosi i miris prirode. No, na njenom putu, naišla je na bahatog taksista koji joj je blokirao put. Taksist nije postupio kako treba ne znajuci sa kim ima posla. I tako je Jadranka donijela odluku. Vrijeme je za osvetu. Nije samo bicikl u pitanju. Sada je ona lovac, a taksisti su njen plijen. Započela je svoj put - s osvetom u srcu i smiješkom na licu. Taksisti, pripremite se... Jer Jadranka dolazi!
+            </div>
+            <button id="startButton">KRENI U LOV</button>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div class="bottom-controls">
+        <button id="leftButton" class="action-button arrow-button">←</button>
+        <button id="shootButton" class="action-button">PUCAJ</button>
+        <button id="rightButton" class="action-button arrow-button">→</button>
+        <button id="newGameButton" class="action-button" style="display: none;">NOVA IGRA</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const introScreen = document.getElementById('introScreen');
+        const startButton = document.getElementById('startButton');
+        const newGameButton = document.getElementById('newGameButton');
+        const leftButton = document.getElementById('leftButton');
+        const rightButton = document.getElementById('rightButton');
+        const shootButton = document.getElementById('shootButton');
+
+        // Set canvas size dynamically
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let gameRunning = false;
+        let jadrankaX = canvas.width / 2;
+        const jadrankaWidth = canvas.width * 0.05;
+        const jadrankaHeight = jadrankaWidth * 1.25;
+        const jadrankaY = canvas.height - jadrankaHeight - 10;
+        let jadrankaSpeed = canvas.width * 0.008;
+        const shootingPhrases = [
+            'Pederu!',
+            'Pedercino!',
+            'Otplesacu tango an tvom grobu',
+            'Kretenu',
+            'Kretenu primitivni'
+        ];
+        const gameOverPhrase = 'Mos mislit\'';
+        let taxis = [];
+        let bullets = [];
+        let gameInterval;
+        let jadrankaImage = new Image();
+        let taxiImage = new Image();
+        let backgroundImage = new Image();
+        let currentPhrase = null;
+        let phraseDisplayTime = 0;
+        const phraseDuration = 50;
+        let gameScore = 0;
+
+        jadrankaImage.src = 'jadranka.png';
+        taxiImage.src = 'taxi.png';
+        backgroundImage.src = 'background.jpg';
+
+        let imagesLoaded = 0;
+        const totalImages = 3;
+
+        jadrankaImage.onload = checkImagesLoaded;
+        taxiImage.onload = checkImagesLoaded;
+        backgroundImage.onload = checkImagesLoaded;
+
+        function checkImagesLoaded() {
+            imagesLoaded++;
+            if (imagesLoaded === totalImages) {
+                drawBackground();
+            }
+        }
+
+        function drawBackground() {
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        }
+
+        startButton.addEventListener('click', function() {
+            introScreen.style.display = 'none';
+            startGame();
+        });
+
+        function gameLoop() {
+            if (!gameRunning) {
+                ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+                drawJadranka();
+                taxis.forEach(taxi => ctx.drawImage(taxiImage, taxi.x, taxi.y, taxi.width, taxi.height));
+                bullets.forEach(bullet => {
+                    ctx.fillStyle = 'yellow';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                });
+                drawGameOver();
+                return;
+            }
+
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+            
+            ctx.font = `${canvas.width * 0.03}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.fillText(`Score: ${gameScore}`, 20, canvas.height * 0.05);
+
+            drawJadranka();
+            moveTaxis();
+            moveBullets();
+            detectCollisions();
+            detectBulletCollisions();
+            moveJadranka();
+            drawBullets();
+            drawShootingPhrase();
+
+            if (Math.random() < 0.01) {
+                spawnTaxi();
+            }
+
+            if (currentPhrase && phraseDisplayTime > 0) {
+                phraseDisplayTime--;
+                if (phraseDisplayTime <= 0) {
+                    currentPhrase = null;
+                }
+            }
+        }
+
+        function drawJadranka() {
+            ctx.drawImage(jadrankaImage, jadrankaX, jadrankaY, jadrankaWidth, jadrankaHeight);
+        }
+
+        let leftArrowPressed = false;
+        let rightArrowPressed = false;
+
+        function moveJadranka() {
+            if (leftArrowPressed && jadrankaX > 0) {
+                jadrankaX -= jadrankaSpeed;
+            }
+            if (rightArrowPressed && jadrankaX < canvas.width - jadrankaWidth) {
+                jadrankaX += jadrankaSpeed;
+            }
+        }
+
+        function spawnTaxi() {
+            let taxi = {
+                x: Math.random() * (canvas.width - canvas.width * 0.075),
+                y: -canvas.height * 0.083,
+                width: canvas.width * 0.075,
+                height: canvas.height * 0.066,
+                speed: canvas.height * 0.0033 + Math.random() * canvas.height * 0.0025
+            };
+            taxis.push(taxi);
+        }
+
+        function moveTaxis() {
+            for (let i = 0; i < taxis.length; i++) {
+                let taxi = taxis[i];
+                taxi.y += taxi.speed;
+                ctx.drawImage(taxiImage, taxi.x, taxi.y, taxi.width, taxi.height);
+                if (taxi.y > canvas.height) {
+                    taxis.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function shoot() {
+            bullets.push({
+                x: jadrankaX + jadrankaWidth / 2 - canvas.width * 0.0125 / 2,
+                y: jadrankaY,
+                width: canvas.width * 0.0125,
+                height: canvas.height * 0.033,
+                speed: -canvas.height * 0.016
+            });
+        }
+
+        function moveBullets() {
+            for (let i = 0; i < bullets.length; i++) {
+                let bullet = bullets[i];
+                bullet.y += bullet.speed;
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                if (bullet.y < -bullet.height) {
+                    bullets.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function detectCollisions() {
+            for (let i = 0; i < taxis.length; i++) {
+                let taxi = taxis[i];
+                if (taxi.y + taxi.height > jadrankaY &&
+                    taxi.y < jadrankaY + jadrankaHeight &&
+                    taxi.x + taxi.width > jadrankaX &&
+                    taxi.x < jadrankaX + jadrankaWidth) {
+                    jadrankaDies();
+                    break;
+                }
+            }
+        }
+
+        function detectBulletCollisions() {
+            for (let i = 0; i < bullets.length; i++) {
+                let bullet = bullets[i];
+                for (let j = 0; j < taxis.length; j++) {
+                    let taxi = taxis[j];
+                    if (bullet.y < taxi.y + taxi.height &&
+                        bullet.y + bullet.height > taxi.y &&
+                        bullet.x < taxi.x + taxi.width &&
+                        bullet.x + bullet.width > taxi.x) {
+                        bullets.splice(i, 1);
+                        i--;
+                        taxis.splice(j, 1);
+                        j--;
+                        gameScore += 100;
+                        showShootingPhrase();
+                        break;
+                    }
+                }
+            }
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = 'yellow';
+            for (let i = 0; i < bullets.length; i++) {
+                let bullet = bullets[i];
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            }
+        }
+
+        function showShootingPhrase() {
+            if (shootingPhrases.length > 0) {
+                currentPhrase = shootingPhrases[Math.floor(Math.random() * shootingPhrases.length)];
+                phraseDisplayTime = phraseDuration;
+            }
+        }
+
+        function drawShootingPhrase() {
+            if (currentPhrase && phraseDisplayTime > 0) {
+                ctx.font = `bold ${canvas.width * 0.06}px Creepster`;
+                ctx.fillStyle = '#FF0000';
+                ctx.textAlign = 'center';
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
+                ctx.strokeText(currentPhrase, canvas.width / 2, canvas.height / 3);
+                ctx.fillText(currentPhrase, canvas.width / 2, canvas.height / 3);
+                ctx.textAlign = 'start';
+            }
+        }
+
+        function jadrankaDies() {
+            gameRunning = false;
+            clearInterval(gameInterval);
+            currentPhrase = gameOverPhrase;
+            phraseDisplayTime = phraseDuration * 3;
+            newGameButton.style.display = 'inline-block';
+        }
+
+        function drawGameOver() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = `bold ${canvas.width * 0.075}px Creepster`;
+            ctx.fillStyle = '#FF0000';
+            ctx.textAlign = 'center';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 3;
+            ctx.strokeText(currentPhrase, canvas.width / 2, canvas.height / 2 - canvas.height * 0.066);
+            ctx.fillText(currentPhrase, canvas.width / 2, canvas.height / 2 - canvas.height * 0.066);
+            
+            ctx.font = `bold ${canvas.width * 0.045}px Creepster`;
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.strokeText(`Final Score: ${gameScore}`, canvas.width / 2, canvas.height / 2 + canvas.height * 0.066);
+            ctx.fillText(`Final Score: ${gameScore}`, canvas.width / 2, canvas.height / 2 + canvas.height * 0.066);
+            
+            ctx.textAlign = 'start';
+        }
+
+        function startGame() {
+            gameRunning = true;
+            jadrankaX = canvas.width / 2;
+            taxis = [];
+            bullets = [];
+            currentPhrase = null;
+            phraseDisplayTime = 0;
+            gameScore = 0;
+            newGameButton.style.display = 'none';
+            clearInterval(gameInterval);
+            gameInterval = setInterval(gameLoop, 1000 / 60);
+            spawnTaxi();
+        }
+
+        // Touch and mouse controls
+        leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); leftArrowPressed = true; });
+        leftButton.addEventListener('touchend', (e) => { e.preventDefault(); leftArrowPressed = false; });
+        rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); rightArrowPressed = true; });
+        rightButton.addEventListener('touchend', (e) => { e.preventDefault(); rightArrowPressed = false; });
+        shootButton.addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); });
+
+        leftButton.addEventListener('mousedown', (e) => { e.preventDefault(); leftArrowPressed = true; });
+        leftButton.addEventListener('mouseup', () => { leftArrowPressed = false; });
+        rightButton.addEventListener('mousedown', (e) => { e.preventDefault(); rightArrowPressed = true; });
+        rightButton.addEventListener('mouseup', () => { rightArrowPressed = false; });
+        shootButton.addEventListener('mousedown', (e) => { e.preventDefault(); shoot(); });
+
+        newGameButton.addEventListener('click', startGame);
+
+        // Prevent context menu on long press
+        window.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Initial draw
+        drawBackground();
+    </script>
+</body>
+</html>
